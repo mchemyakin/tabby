@@ -15,7 +15,11 @@ import { parseTabbyURL, isTabbyURL } from './urlHandler'
 
 let DwmEnableBlurBehindWindow: any = null
 if (process.platform === 'win32') {
-    DwmEnableBlurBehindWindow = require('@tabby-gang/windows-blurbehind').DwmEnableBlurBehindWindow
+    try {
+        DwmEnableBlurBehindWindow = require('@tabby-gang/windows-blurbehind').DwmEnableBlurBehindWindow
+    } catch (error) {
+        console.warn('windows-blurbehind is unavailable, using fallback vibrancy handling', error)
+    }
 }
 
 export interface WindowOptions {
@@ -198,7 +202,9 @@ export class Window {
                     console.error('Failed to set window blur', error)
                 }
             } else {
-                DwmEnableBlurBehindWindow(this.window.getNativeWindowHandle(), enabled)
+                if (DwmEnableBlurBehindWindow) {
+                    DwmEnableBlurBehindWindow(this.window.getNativeWindowHandle(), enabled)
+                }
             }
         } else if (process.platform === 'linux') {
             this.window.setBackgroundColor(enabled ? '#00000000' : '#131d27')
