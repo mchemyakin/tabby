@@ -112,6 +112,9 @@ export class ElectronPTYProxy extends PTYProxy {
             }))
         }
         if (process.platform === 'win32') {
+            if (!windowsProcessTree?.getProcessTree) {
+                return []
+            }
             return new Promise<ChildProcess[]>(resolve => {
                 windowsProcessTree.getProcessTree(truePID, tree => {
                     resolve(tree ? tree.children.map(child => ({
@@ -134,7 +137,11 @@ export class ElectronPTYProxy extends PTYProxy {
     }
 
     async getWorkingDirectory (): Promise<string|null> {
-        return getWorkingDirectoryFromPID(await this.getTruePID())
+        try {
+            return getWorkingDirectoryFromPID(await this.getTruePID())
+        } catch {
+            return null
+        }
     }
 
 }
