@@ -20,7 +20,7 @@ export class Cygwin64ShellProvider extends ShellProvider {
     }
 
     async provide (): Promise<Shell[]> {
-        if (this.hostApp.platform !== Platform.Windows) {
+        if (this.hostApp.platform !== Platform.Windows || !wnr?.getRegistryValue) {
             return []
         }
 

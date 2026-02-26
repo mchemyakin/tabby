@@ -45,7 +45,7 @@ export class WSLShellProvider extends ShellProvider {
     }
 
     async provide (): Promise<Shell[]> {
-        if (this.hostApp.platform !== Platform.Windows) {
+        if (this.hostApp.platform !== Platform.Windows || !wnr?.getRegistryKey || !wnr?.listRegistrySubkeys) {
             return []
         }
 

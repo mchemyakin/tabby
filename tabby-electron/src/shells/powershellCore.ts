@@ -22,7 +22,7 @@ export class PowerShellCoreShellProvider extends WindowsBaseShellProvider {
     }
 
     async provide (): Promise<Shell[]> {
-        if (this.hostApp.platform !== Platform.Windows) {
+        if (this.hostApp.platform !== Platform.Windows || !wnr?.getRegistryValue) {
             return []
         }
 
