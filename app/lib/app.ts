@@ -236,10 +236,17 @@ export class Application {
 
     private useBuiltinGraphics (): void {
         if (process.platform === 'win32') {
+            if (!wnr?.getRegistryValue || !wnr?.setRegistryValue) {
+                return
+            }
             const keyPath = 'SOFTWARE\\Microsoft\\DirectX\\UserGpuPreferences'
             const valueName = app.getPath('exe')
-            if (!wnr.getRegistryValue(wnr.HK.CU, keyPath, valueName)) {
-                wnr.setRegistryValue(wnr.HK.CU, keyPath, valueName, wnr.REG.SZ, 'GpuPreference=1;')
+            try {
+                if (!wnr.getRegistryValue(wnr.HK.CU, keyPath, valueName)) {
+                    wnr.setRegistryValue(wnr.HK.CU, keyPath, valueName, wnr.REG.SZ, 'GpuPreference=1;')
+                }
+            } catch (error) {
+                console.warn('windows-native-registry is unavailable, skipping GPU registry setup', error)
             }
         }
     }
