@@ -245,8 +245,8 @@ export class Application {
                 if (!wnr.getRegistryValue(wnr.HK.CU, keyPath, valueName)) {
                     wnr.setRegistryValue(wnr.HK.CU, keyPath, valueName, wnr.REG.SZ, 'GpuPreference=1;')
                 }
-            } catch (error) {
-                console.warn('windows-native-registry is unavailable, skipping GPU registry setup', error)
+            } catch {
+                console.warn('windows-native-registry is unavailable, skipping GPU registry setup')
             }
         }
     }

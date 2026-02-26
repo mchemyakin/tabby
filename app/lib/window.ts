@@ -17,8 +17,8 @@ let DwmEnableBlurBehindWindow: any = null
 if (process.platform === 'win32') {
     try {
         DwmEnableBlurBehindWindow = require('@tabby-gang/windows-blurbehind').DwmEnableBlurBehindWindow
-    } catch (error) {
-        console.warn('windows-blurbehind is unavailable, using fallback vibrancy handling', error)
+    } catch {
+        console.warn('windows-blurbehind is unavailable, using fallback vibrancy handling')
     }
 }
 
