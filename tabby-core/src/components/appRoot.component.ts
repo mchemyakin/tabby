@@ -11,12 +11,13 @@ import { ConfigService } from '../services/config.service'
 import { ThemesService } from '../services/themes.service'
 import { UpdaterService } from '../services/updater.service'
 import { CommandService } from '../services/commands.service'
+import { ProfilesService } from '../services/profiles.service'
 
 import { BaseTabComponent } from './baseTab.component'
 import { SafeModeModalComponent } from './safeModeModal.component'
 import { TabBodyComponent } from './tabBody.component'
 import { SplitTabComponent } from './splitTab.component'
-import { AppService, Command, CommandLocation, FileTransfer, HostWindowService, PlatformService } from '../api'
+import { AppService, Command, CommandLocation, FileTransfer, HostWindowService, PartialProfile, PlatformService, Profile } from '../api'
 
 function makeTabAnimation (dimension: string, size: number) {
     return [
@@ -73,6 +74,7 @@ export class AppRootComponent {
     @ViewChildren(TabBodyComponent) tabBodies: TabBodyComponent[]
     @ViewChild('activeTransfersDropdown') activeTransfersDropdown: NgbDropdown
     unsortedTabs: BaseTabComponent[] = []
+    savedProfiles: PartialProfile<Profile>[] = []
     updatesAvailable = false
     activeTransfers: FileTransfer[] = []
     private logger: Logger
@@ -80,6 +82,7 @@ export class AppRootComponent {
     constructor (
         private hotkeys: HotkeysService,
         private commands: CommandService,
+        private profiles: ProfilesService,
         public updater: UpdaterService,
         public hostWindow: HostWindowService,
         public hostApp: HostAppService,
@@ -146,6 +149,10 @@ export class AppRootComponent {
             this.app.closeWindow()
         })
 
+        this.config.changed$.subscribe(() => {
+            this.loadSavedProfiles()
+        })
+
         if (window['safeModeReason']) {
             ngbModal.open(SafeModeModalComponent)
         }
@@ -175,6 +182,7 @@ export class AppRootComponent {
         config.ready$.toPromise().then(async () => {
             this.leftToolbarButtons = await this.getToolbarButtons(false)
             this.rightToolbarButtons = await this.getToolbarButtons(true)
+            await this.loadSavedProfiles()
 
             setInterval(() => {
                 if (this.config.store.enableAutomaticUpdates) {
@@ -232,6 +240,18 @@ export class AppRootComponent {
         }
     }
 
+    async openSavedProfile (profile: PartialProfile<Profile>): Promise<void> {
+        await this.profiles.launchProfile(profile)
+    }
+
+    savedProfilesTrackBy (_: number, profile: PartialProfile<Profile>): string {
+        return profile.id ?? `${profile.type}:${profile.name}`
+    }
+
+    getProfileDescription (profile: PartialProfile<Profile>): string|null {
+        return this.profiles.getDescription(profile)
+    }
+
     @HostBinding('class.vibrant') get isVibrant () {
         return this.config.store?.appearance.vibrancy
     }
@@ -254,5 +274,10 @@ export class AppRootComponent {
                 && this.config.store.appearance.tabsLocation !== 'top'
                 && this.config.store.appearance.tabsLocation !== 'bottom'
         )
+    }
+
+    private async loadSavedProfiles (): Promise<void> {
+        const profiles = await this.profiles.getProfiles({ includeBuiltin: false, clone: true })
+        this.savedProfiles = profiles.filter(x => x.id && !x.isTemplate && !!this.profiles.providerForProfile(x))
     }
 }

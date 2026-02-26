@@ -24,6 +24,80 @@ $tab-border-radius: 4px;
   flex-direction: row;
 }
 
+.workspace {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+.workspace > .content {
+    width: auto;
+}
+
+.saved-connections-sidebar {
+    width: calc(260px * var(--spaciness));
+    flex: 0 0 calc(260px * var(--spaciness));
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+}
+
+.saved-connections-title {
+    padding: 14px 12px 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+}
+
+.saved-connection {
+    appearance: none;
+    border: none;
+    text-align: left;
+    background: transparent;
+    color: inherit;
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    transition: background 0.15s ease-out;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.saved-connection-body {
+    min-width: 0;
+}
+
+.saved-connection-name {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.saved-connection-description {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.saved-connections-empty {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
 .content {
     width: 100vw;
     flex: 1 1 0;
