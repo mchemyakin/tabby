@@ -11,7 +11,13 @@ import { ElectronHostWindow } from './hostWindow.service'
 import { ShellIntegrationService } from './shellIntegration.service'
 import { ElectronHostAppService } from './hostApp.service'
 import { configPath } from '../../../app/lib/config'
-const fontManager = require('fontmanager-redux') // eslint-disable-line
+let fontManager: any = null
+try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    fontManager = require('fontmanager-redux')
+} catch {
+    console.warn('fontmanager-redux is unavailable, using fallback font list')
+}
 
 /* eslint-disable block-scoped-var */
 
@@ -158,9 +164,12 @@ export class ElectronPlatformService extends PlatformService {
 
     async listFonts (): Promise<string[]> {
         if (this.hostApp.platform === Platform.Windows || this.hostApp.platform === Platform.macOS) {
-            let fonts = await new Promise<any[]>(resolve => fontManager.getAvailableFonts(resolve))
-            fonts = fonts.map(x => x.family.trim())
-            return fonts
+            if (fontManager?.getAvailableFonts) {
+                let fonts = await new Promise<any[]>(resolve => fontManager.getAvailableFonts(resolve))
+                fonts = fonts.map(x => x.family.trim())
+                return fonts
+            }
+            return ['Consolas', 'Cascadia Mono', 'Courier New', 'Source Code Pro']
         }
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this.hostApp.platform === Platform.Linux) {
