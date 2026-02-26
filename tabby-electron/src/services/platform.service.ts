@@ -97,6 +97,9 @@ export class ElectronPlatformService extends PlatformService {
     }
 
     getWinSCPPath (): string|null {
+        if (!wnr?.getRegistryKey) {
+            return null
+        }
         const key = wnr.getRegistryKey(wnr.HK.CR, 'WinSCP.Url\\DefaultIcon')
         if (key?.['']) {
             let detectedPath = key[''].value?.split(',')[0]
